@@ -9,4 +9,5 @@ urlpatterns = [
     path('finches/<int:pk>/', views.FinchDetail.as_view(), name="finch_detail"),
     path('finches/<int:pk>/update', views.FinchUpdate.as_view(), name="finch_update"),
     path('finches/<int:pk>/delete', views.FinchDelete.as_view(), name="finch_delete"),
+    path('accounts/signup/', views.Signup.as_view(), name="signup"),
 ]

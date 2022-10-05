@@ -6,6 +6,9 @@ from .models import Finch
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import DetailView
 from django.urls import reverse
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect, render
 # Create your views here.
 
 class Home(TemplateView):
@@ -24,7 +27,7 @@ class FinchList(TemplateView):
         # If a query exists we will filter by name 
         if name != None:
                 # .filter is the sql WHERE statement and name__icontains is doing a search for any name that contains the query param
-                context["finches"] = Finch.objects.filter(name__icontains=name)
+                context["finches"] = Finch.objects.filter(name__icontains=name, user=self.request.user)
                 # We add a header context that includes the search param
                 context["header"] = f"Searching for {name}"
         else:
@@ -38,6 +41,10 @@ class FinchCreate(CreateView):
     fields = ['name', 'img', 'bio']
     template_name = "finch_create.html"
     success_url = "/finches/"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(FinchCreate, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('finch_detail', kwargs={'pk': self.object.pk})
@@ -59,3 +66,20 @@ class FinchDelete(DeleteView):
     model = Finch
     template_name = "finch_delete_confirmation.html"
     success_url = "/finches/"
+
+class Signup(View):
+    # show a form to fill out
+    def get(self, request):
+        form = UserCreationForm()
+        context = {"form": form}
+        return render(request, "registration/signup.html", context)
+    # on form submit, validate the form and login the user.
+    def post(self, request):
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("artist_list")
+        else:
+            context = {"form": form}
+            return render(request, "registration/signup.html", context)

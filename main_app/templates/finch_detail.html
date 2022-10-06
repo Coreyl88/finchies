@@ -5,6 +5,36 @@
 </div>
 <div class="detail__name">
     <h1 class="title">{{finch.name}}</h1>
+    <span>
+        <div class="dropdown">
+          <div class="dropdown-trigger">
+            <button
+              class="button"
+              aria-haspopup="true"
+              aria-controls="dropdown-menu"
+            >
+              <span>Add to Feathers</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              {% for feather in feathers %}
+          <!-- each playlist becomes a drop
+          down item with the ids needed to add to the join table  -->
+              <a
+                href="{% url 'feathers_assoc' feather.pk finch.pk %}?assoc=add"
+                class="dropdown-item"
+              >
+                {{feather.color}}
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+    </span>
 </div>
 <div class="detail__container">
     <div class="buttons">
@@ -13,16 +43,60 @@
                 <i class="fas fa-edit"></i>
             </span>
         </a>
-        <a href="/artists/{{finch.id}}/delete" class="button is-danger">
+        <a href="{% url 'finch_delete' finch.pk %} class="button is-danger">
             <span class="icon">
                 <i class="fas fa-trash-alt"></i>
             </span>
         </a>
     </div>
+    <form class="mb-5" action="{% url 'sighting_create' finch.pk %}" method="post">
+        {% csrf_token %}
+        <div class="field has-addons">
+            <div class="control">
+                <input
+                    class="input"
+                    type="text"
+                    name="title"
+                    placeholder="Where you see it?"
+                    required
+                />
+            </div>
+            <div class="control">
+                <input
+                    class="input"
+                    type="number"
+                    name="length"
+                    placeholder="Location"
+                    required
+                />
+            </div>
+            <div class="control">
+                <input class="button is-primary" type="submit" value="Add Sighting" />
+            </div>
+        </div>
+    </form>
+    <!-- inside container -->
+    <div class="detail__songs mb-5">
+        <h3 class="title is-3">Sightings</h3>
+
+        {% for sighting in finch.sightings.all %}
+            <div class="song">
+                <span>{{forloop.counter}}</span>
+                <span><b>{{sighting.name}}</b></span>
+                <span>{{sighting.location}}</span>
+            </div>
+        {% empty %}
+            <article class="message">
+                <div class="message-header">
+                    <p>No Sightings Available</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+<!--  above about section  -->
     <div class="detail__about">
         <h4 class="title is-4">About</h4>
         <p>{{finch.bio}}</p>
     </div>
 </div>
-
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Feathercolors, Finch
+from .models import Feather, Finch, Sighting
 # Register your models here.
 admin.site.register(Finch)
-admin.site.register(Feathercolors)
+admin.site.register(Sighting)
+admin.site.register(Feather)
